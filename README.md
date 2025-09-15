@@ -4,19 +4,19 @@ A powerful, modern web-based comparison tool supporting XML, JSON, and Text file
 
 ## Features
 
-### 🎯 Smart Multi-Format Detection
+###  Smart Multi-Format Detection
 - **Intelligent format recognition** - automatically detects XML, JSON, or Text
 - **Format-specific parsing** with optimized algorithms for each type
 - **Real-time validation** with immediate visual feedback
 - **Comprehensive error reporting** with line numbers and context
 
-### 📊 Advanced Comparison Engine
+###  Advanced Comparison Engine
 - **Precision highlighting** that targets exact changes without affecting other content
 - **Smart statistics** showing additions, deletions, and modifications
 - **Visual comparison** with color-coded differences
 - **Professional results display** with clean, modern interface
 
-### 🎨 Modern Professional Design
+###  Modern Professional Design
 - **Stunning landing page** with interactive elements and animations
 - **Glassmorphism navigation** with smooth transitions
 - **Timeline-based process visualization** with animated steps
@@ -24,7 +24,7 @@ A powerful, modern web-based comparison tool supporting XML, JSON, and Text file
 - **Professional typography** with Inter font family
 - **Gradient effects** and modern color schemes
 
-### � Enhanced User Experience
+###  Enhanced User Experience
 - **Tabbed interface** for easy format switching
 - **Real-time validation feedback** as you type
 - **Animated visual effects** including floating elements and pulse animations
@@ -32,7 +32,7 @@ A powerful, modern web-based comparison tool supporting XML, JSON, and Text file
 - **Instant results** with optimized performance
 - **100% secure** - all processing happens locally
 
-## 🛠️ Technology Stack
+##  Technology Stack
 
 - **Backend**: Python Flask 2.3.3 with enhanced multi-format processing
 - **Frontend**: Modern HTML5, CSS3 with animations, Vanilla JavaScript
@@ -44,7 +44,7 @@ A powerful, modern web-based comparison tool supporting XML, JSON, and Text file
 - **Fonts**: Inter font family with Font Awesome icons
 - **Design**: Professional glassmorphism effects and modern UI patterns
 
-## 🚀 Supported Formats
+##  Supported Formats
 
 ### XML Files
 - Structure-aware comparison with element-level precision
@@ -65,7 +65,7 @@ A powerful, modern web-based comparison tool supporting XML, JSON, and Text file
 - Clean, readable difference visualization
 
 
-## 🎯 How to Use
+##  How to Use
 
 ### Step 1: Choose Your Format
 - Visit the modern landing page with interactive design
@@ -82,7 +82,7 @@ A powerful, modern web-based comparison tool supporting XML, JSON, and Text file
 - Review color-coded differences with precision highlighting
 - Check comprehensive statistics and insights
 
-## 🎨 Interface Features
+##  Interface Features
 
 - **Modern Landing Page**: Professional design with animations and interactive elements
 - **Tabbed Interface**: Easy switching between XML, JSON, and Text formats
