@@ -64,61 +64,7 @@ A powerful, modern web-based comparison tool supporting XML, JSON, and Text file
 - Modified line detection (not just additions/deletions)
 - Clean, readable difference visualization
 
-## 📦 Installation
-
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/Madhuu06/XML-Differencer.git
-   cd XML-Differencer
-   ```
-
-2. **Create virtual environment**:
-   ```bash
-   python -m venv .venv
-   ```
-
-3. **Activate virtual environment**:
-   - Windows: `.venv\Scripts\activate`
-   - macOS/Linux: `source .venv/bin/activate`
-
-4. **Install dependencies**:
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-5. **Run the application**:
-   ```bash
-   python app.py
-   ```
-
-6. **Open browser** and navigate to:
-   - **Landing Page**: `http://127.0.0.1:5000/`
-   - **Comparison Tool**: `http://127.0.0.1:5000/compare`
-
-## 🚀 Deploy to Render
-
-This application is ready for deployment on [Render](https://render.com) with the following configuration:
-
-### Option 1: Using render.yaml (Recommended)
-1. Connect your GitHub repository to Render
-2. The `render.yaml` file will automatically configure the deployment
-3. Render will use Gunicorn as the WSGI server for production
-
-### Option 2: Manual Setup
-1. Create a new Web Service on Render
-2. Connect your GitHub repository
-3. Use these settings:
-   - **Build Command**: `pip install -r requirements.txt`
-   - **Start Command**: `gunicorn --bind 0.0.0.0:$PORT app:app`
-   - **Environment**: Python 3
-   - **Plan**: Free (or your preferred plan)
-
-### Production Features
-- ✅ **Gunicorn WSGI server** for production performance
-- ✅ **Environment-based configuration** with PORT detection
-- ✅ **Production-ready Flask settings** (debug=False)
-- ✅ **Automatic dependency management** via requirements.txt
-- ✅ **Cross-platform compatibility** for Linux deployment
+- **Comparison Tool**: `http://127.0.0.1:5000/compare`
 
 ## 🎯 How to Use
 
@@ -163,4 +109,9 @@ Multi-Format-Differencer/
 ├── requirements.txt         # Python dependencies
 └── README.md               # This documentation
 ```
+
+# Website
+
+
+https://xml-differencer.onrender.com/
 
