@@ -2,21 +2,21 @@
 
 A powerful, modern web-based comparison tool supporting XML, JSON, and Text files with professional-grade analysis and beautiful visualizations.
 
-## ✨ Features
+## Features
 
-### 🎯 Smart Multi-Format Detection
+###  Smart Multi-Format Detection
 - **Intelligent format recognition** - automatically detects XML, JSON, or Text
 - **Format-specific parsing** with optimized algorithms for each type
 - **Real-time validation** with immediate visual feedback
 - **Comprehensive error reporting** with line numbers and context
 
-### 📊 Advanced Comparison Engine
+###  Advanced Comparison Engine
 - **Precision highlighting** that targets exact changes without affecting other content
 - **Smart statistics** showing additions, deletions, and modifications
 - **Visual comparison** with color-coded differences
 - **Professional results display** with clean, modern interface
 
-### 🎨 Modern Professional Design
+###  Modern Professional Design
 - **Stunning landing page** with interactive elements and animations
 - **Glassmorphism navigation** with smooth transitions
 - **Timeline-based process visualization** with animated steps
@@ -24,7 +24,7 @@ A powerful, modern web-based comparison tool supporting XML, JSON, and Text file
 - **Professional typography** with Inter font family
 - **Gradient effects** and modern color schemes
 
-### � Enhanced User Experience
+###  Enhanced User Experience
 - **Tabbed interface** for easy format switching
 - **Real-time validation feedback** as you type
 - **Animated visual effects** including floating elements and pulse animations
@@ -32,7 +32,7 @@ A powerful, modern web-based comparison tool supporting XML, JSON, and Text file
 - **Instant results** with optimized performance
 - **100% secure** - all processing happens locally
 
-## 🛠️ Technology Stack
+##  Technology Stack
 
 - **Backend**: Python Flask 2.3.3 with enhanced multi-format processing
 - **Frontend**: Modern HTML5, CSS3 with animations, Vanilla JavaScript
@@ -44,7 +44,7 @@ A powerful, modern web-based comparison tool supporting XML, JSON, and Text file
 - **Fonts**: Inter font family with Font Awesome icons
 - **Design**: Professional glassmorphism effects and modern UI patterns
 
-## 🚀 Supported Formats
+##  Supported Formats
 
 ### XML Files
 - Structure-aware comparison with element-level precision
@@ -137,7 +137,7 @@ This application is ready for deployment on [Render](https://render.com) with th
 - Review color-coded differences with precision highlighting
 - Check comprehensive statistics and insights
 
-## 🎨 Interface Features
+##  Interface Features
 
 - **Modern Landing Page**: Professional design with animations and interactive elements
 - **Tabbed Interface**: Easy switching between XML, JSON, and Text formats
@@ -145,7 +145,7 @@ This application is ready for deployment on [Render](https://render.com) with th
 - **Professional Results**: Clean statistics display without overwhelming details
 - **Responsive Design**: Perfect experience on desktop, tablet, and mobile
 
-## 🗂️ Project Structure
+## Project Structure
 
 ```
 Multi-Format-Differencer/
@@ -164,54 +164,3 @@ Multi-Format-Differencer/
 └── README.md               # This documentation
 ```
 
-## 🚀 Recent Major Updates
-
-### Version 2.0 - Modern Redesign
-- ✅ **Complete UI/UX overhaul** with professional modern design
-- ✅ **Multi-format support** - XML, JSON, and Text comparison
-- ✅ **Interactive landing page** with animations and visual effects
-- ✅ **Enhanced comparison engine** with precision highlighting
-- ✅ **Improved statistics** showing modified lines vs separate add/delete
-- ✅ **Professional styling** with glassmorphism and gradient effects
-- ✅ **Responsive design** optimized for all screen sizes
-- ✅ **Timeline visualization** for the "How It Works" section
-
-### Previous Improvements
-- ✅ Enhanced error messages with line numbers
-- ✅ Real-time validation across all formats
-- ✅ Comprehensive error detection
-- ✅ Visual feedback system
-- ✅ Tabbed interface for format switching
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Make your changes with proper testing
-4. Commit your changes (`git commit -m 'Add amazing feature'`)
-5. Push to the branch (`git push origin feature/amazing-feature`)
-6. Open a Pull Request
-
-## 📄 License
-
-This project is open source and available under the [MIT License](LICENSE).
-
-## 👨‍💻 Author
-
-**Madhuu06** - *Full-stack Developer*
-- GitHub: [@Madhuu06](https://github.com/Madhuu06)
-- Project: [XML-Differencer](https://github.com/Madhuu06/XML-Differencer)
-
-Built with ❤️ and modern web technologies
-
----
-
-## 🌟 Demo
-
-Experience the modern, professional file comparison tool with:
-- **Beautiful landing page** with interactive animations
-- **Smart multi-format detection** for XML, JSON, and Text
-- **Professional results** with precision highlighting
-- **Responsive design** that works on any device
-
-Try it now at the live demo or clone and run locally!
