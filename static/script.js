@@ -203,17 +203,21 @@ function updateStatistics(data, format) {
   // Update labels based on format
   const missingLabel = document.getElementById('missingLabel');
   const extraLabel = document.getElementById('extraLabel');
+  const mismatchLabel = document.getElementById('mismatchLabel');
   
-  if (missingLabel && extraLabel) {
+  if (missingLabel && extraLabel && mismatchLabel) {
     if (format === 'xml') {
       missingLabel.textContent = 'Missing Tags';
       extraLabel.textContent = 'Extra Tags';
+      mismatchLabel.textContent = 'Mismatches';
     } else if (format === 'json') {
       missingLabel.textContent = 'Missing Keys';
       extraLabel.textContent = 'Extra Keys';
+      mismatchLabel.textContent = 'Mismatches';
     } else if (format === 'text') {
       missingLabel.textContent = 'Removed Lines';
       extraLabel.textContent = 'Added Lines';
+      mismatchLabel.textContent = 'Modified Lines';
     }
   }
 }
@@ -225,16 +229,6 @@ function updateResultsForFormat(format) {
   
   if (leftPanelTitle) leftPanelTitle.textContent = `${format} File 1`;
   if (rightPanelTitle) rightPanelTitle.textContent = `${format} File 2`;
-  
-  // Hide differences table for text format
-  const differencesTable = document.getElementById('differencesTable');
-  if (differencesTable) {
-    if (format === 'Text') {
-      differencesTable.style.display = 'none';
-    } else {
-      differencesTable.style.display = 'block';
-    }
-  }
 }
 
 // Format switching functionality

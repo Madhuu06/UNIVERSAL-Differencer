@@ -121,7 +121,7 @@ def compare_text():
             'total_differences': len(diffs),
             'missing_items': len([d for d in diffs if d['Difference Type'] == 'Missing Line']),
             'extra_items': len([d for d in diffs if d['Difference Type'] == 'Added Line']),
-            'value_mismatches': 0  # Text comparison doesn't have mismatches, only missing/added
+            'value_mismatches': len([d for d in diffs if d['Difference Type'] == 'Modified Line'])
         }
 
         return jsonify({
@@ -206,46 +206,53 @@ def compare_text_lines(text1, text2):
     
     differences = []
     
-    # Use difflib to get detailed differences
-    diff = list(difflib.unified_diff(lines1, lines2, lineterm='', n=0))
+    # Use difflib.SequenceMatcher for better line-by-line comparison
+    matcher = difflib.SequenceMatcher(None, lines1, lines2)
     
-    current_line1 = 1
-    current_line2 = 1
-    
-    for line in diff:
-        if line.startswith('@@'):
-            # Parse line numbers from diff header
-            import re
-            match = re.match(r'@@ -(\d+)(?:,(\d+))? \+(\d+)(?:,(\d+))? @@', line)
-            if match:
-                start1 = int(match.group(1))
-                count1 = int(match.group(2)) if match.group(2) else 1
-                start2 = int(match.group(3))
-                count2 = int(match.group(4)) if match.group(4) else 1
-                current_line1 = start1
-                current_line2 = start2
-        elif line.startswith('---') or line.startswith('+++'):
+    for tag, i1, i2, j1, j2 in matcher.get_opcodes():
+        if tag == 'equal':
+            # Lines are identical, skip
             continue
-        elif line.startswith('-'):
-            # Line removed from file 1 (missing in file 2)
-            differences.append({
-                'Difference Type': 'Missing Line',
-                'Line Number': str(current_line1),
-                'Content': line[1:]  # Remove the '-' prefix
-            })
-            current_line1 += 1
-        elif line.startswith('+'):
-            # Line added to file 2 (extra in file 2)
-            differences.append({
-                'Difference Type': 'Added Line',
-                'Line Number': str(current_line2),
-                'Content': line[1:]  # Remove the '+' prefix
-            })
-            current_line2 += 1
-        else:
-            # Context line (unchanged)
-            current_line1 += 1
-            current_line2 += 1
+        elif tag == 'delete':
+            # Lines only in file 1 (missing from file 2)
+            for i in range(i1, i2):
+                differences.append({
+                    'Difference Type': 'Missing Line',
+                    'Line Number': str(i + 1),
+                    'Content': lines1[i]
+                })
+        elif tag == 'insert':
+            # Lines only in file 2 (added to file 2)
+            for j in range(j1, j2):
+                differences.append({
+                    'Difference Type': 'Added Line',
+                    'Line Number': str(j + 1),
+                    'Content': lines2[j]
+                })
+        elif tag == 'replace':
+            # Lines are different - treat as modified lines
+            # If same number of lines changed, treat as modifications
+            if (i2 - i1) == (j2 - j1):
+                for i, j in zip(range(i1, i2), range(j1, j2)):
+                    differences.append({
+                        'Difference Type': 'Modified Line',
+                        'Line Number': str(i + 1),
+                        'Content': f"'{lines1[i]}' → '{lines2[j]}'"
+                    })
+            else:
+                # Different number of lines, treat as separate delete/insert
+                for i in range(i1, i2):
+                    differences.append({
+                        'Difference Type': 'Missing Line',
+                        'Line Number': str(i + 1),
+                        'Content': lines1[i]
+                    })
+                for j in range(j1, j2):
+                    differences.append({
+                        'Difference Type': 'Added Line',
+                        'Line Number': str(j + 1),
+                        'Content': lines2[j]
+                    })
             
     return differences
 

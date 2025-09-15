@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Universal Differencer - XML, JSON, Text Comparison</title>
+    <title>Universal Differencer </title>
     <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64," />
     <link rel="icon" href="../static/img/favicon.png" type="image/png" />
     <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="" />
@@ -319,7 +319,7 @@
               </div>
               <div class="space-y-1">
                 <p class="text-2xl font-bold text-orange-600" id="mismatchItems">0</p>
-                <p class="text-sm text-gray-600">Mismatches</p>
+                <p class="text-sm text-gray-600" id="mismatchLabel">Mismatches</p>
               </div>
             </div>
           </div>
@@ -357,27 +357,6 @@
                   <div id="highlight-right" class="xml-display-box"></div>
                 </div>
               </div>
-            </div>
-          </div>
-
-          <!-- Differences Summary Table -->
-          <div id="differencesTable" class="mt-6 bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-            <div class="px-6 py-4 border-b border-gray-200">
-              <h3 class="text-lg font-semibold text-gray-900">Detailed Differences</h3>
-            </div>
-            <div class="overflow-x-auto">
-              <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
-                  <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" id="pathHeader">Path</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" id="attributeHeader">Attribute</th>
-                  </tr>
-                </thead>
-                <tbody id="differencesTableBody" class="bg-white divide-y divide-gray-200">
-                  <!-- Dynamic content will be inserted here -->
-                </tbody>
-              </table>
             </div>
           </div>
         </div>
