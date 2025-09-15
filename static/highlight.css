@@ -152,3 +152,117 @@
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
+
+/* JSON and Text highlighting styles */
+.diff-removed {
+  background-color: #ffeef0;
+  color: #d73a49;
+  padding: 2px 4px;
+  border-radius: 3px;
+  border-left: 3px solid #d73a49;
+  display: block;
+  margin: 1px 0;
+  text-decoration: line-through;
+}
+
+.diff-added {
+  background-color: #f0fff4;
+  color: #22863a;
+  padding: 2px 4px;
+  border-radius: 3px;
+  border-left: 3px solid #22863a;
+  display: block;
+  margin: 1px 0;
+}
+
+.diff-modified {
+  background-color: #fff5b4;
+  color: #b08800;
+  padding: 2px 4px;
+  border-radius: 3px;
+  border-left: 3px solid #b08800;
+  display: block;
+  margin: 1px 0;
+}
+
+/* Line numbers for text comparison */
+.line-number {
+  color: #6b7280;
+  margin-right: 12px;
+  user-select: none;
+  font-family: monospace;
+  font-size: 12px;
+}
+
+/* Format section transitions */
+.comparison-section {
+  transition: all 0.3s ease-in-out;
+}
+
+.comparison-section.hidden {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+.comparison-section:not(.hidden) {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Format tab styling */
+.format-tab {
+  transition: all 0.2s ease-in-out;
+  position: relative;
+}
+
+.format-tab:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.format-tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 2px;
+  background-color: currentColor;
+  border-radius: 1px;
+}
+
+/* Difference type badges */
+.diff-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.diff-badge-missing {
+  background-color: #fee2e2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+}
+
+.diff-badge-extra {
+  background-color: #dcfce7;
+  color: #16a34a;
+  border: 1px solid #bbf7d0;
+}
+
+.diff-badge-mismatch {
+  background-color: #fef3c7;
+  color: #d97706;
+  border: 1px solid #fde68a;
+}
+
+.diff-badge-text {
+  background-color: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
+}

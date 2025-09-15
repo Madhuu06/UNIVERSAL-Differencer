@@ -1,5 +1,7 @@
 from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
+import json
+import difflib
 from xml_compare import parse_xml_from_string, flatten_elements, compare_xml
 from highlight_util import highlight_xml_strings
 
@@ -56,6 +58,298 @@ def compare_page():
             return jsonify({'error': str(e)}), 500
 
     return render_template('index.html')
+
+
+# JSON comparison endpoint
+@app.route('/compare_json', methods=['POST'])
+def compare_json():
+    try:
+        data = request.get_json()
+        json1_str = data.get('json1')
+        json2_str = data.get('json2')
+
+        # Parse JSON
+        try:
+            json1 = json.loads(json1_str)
+            json2 = json.loads(json2_str)
+        except json.JSONDecodeError as e:
+            return jsonify({'error': f'Invalid JSON: {str(e)}'}), 400
+
+        # Compare JSON objects
+        diffs = compare_json_objects(json1, json2)
+        
+        # Highlight differences in JSON strings
+        left, right = highlight_json_strings(json1_str, json2_str, diffs)
+
+        # Calculate statistics
+        stats = {
+            'total_differences': len(diffs),
+            'missing_items': len([d for d in diffs if d['Difference Type'] == 'Missing']),
+            'extra_items': len([d for d in diffs if d['Difference Type'] == 'Extra']),
+            'value_mismatches': len([d for d in diffs if d['Difference Type'] == 'Value mismatch'])
+        }
+
+        return jsonify({
+            'left': left,
+            'right': right,
+            'differences': diffs,
+            'statistics': stats
+        })
+
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+
+
+# Text comparison endpoint
+@app.route('/compare_text', methods=['POST'])
+def compare_text():
+    try:
+        data = request.get_json()
+        text1 = data.get('text1')
+        text2 = data.get('text2')
+
+        # Compare text line by line
+        diffs = compare_text_lines(text1, text2)
+        
+        # Highlight differences in text
+        left, right = highlight_text_strings(text1, text2, diffs)
+
+        # Calculate statistics
+        stats = {
+            'total_differences': len(diffs),
+            'missing_items': len([d for d in diffs if d['Difference Type'] == 'Missing Line']),
+            'extra_items': len([d for d in diffs if d['Difference Type'] == 'Added Line']),
+            'value_mismatches': 0  # Text comparison doesn't have mismatches, only missing/added
+        }
+
+        return jsonify({
+            'left': left,
+            'right': right,
+            'differences': diffs,
+            'statistics': stats
+        })
+
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+
+
+def compare_json_objects(obj1, obj2, path=""):
+    """Compare two JSON objects and return list of differences"""
+    differences = []
+    
+    def compare_values(val1, val2, current_path):
+        if type(val1) != type(val2):
+            differences.append({
+                'Difference Type': 'Type mismatch',
+                'Key Path': current_path,
+                'Property': f'{type(val1).__name__} vs {type(val2).__name__}'
+            })
+            return
+            
+        if isinstance(val1, dict) and isinstance(val2, dict):
+            all_keys = set(val1.keys()) | set(val2.keys())
+            for key in all_keys:
+                key_path = f"{current_path}.{key}" if current_path else key
+                if key not in val1:
+                    differences.append({
+                        'Difference Type': 'Extra',
+                        'Key Path': key_path,
+                        'Property': str(val2[key])
+                    })
+                elif key not in val2:
+                    differences.append({
+                        'Difference Type': 'Missing',
+                        'Key Path': key_path,
+                        'Property': str(val1[key])
+                    })
+                else:
+                    compare_values(val1[key], val2[key], key_path)
+                    
+        elif isinstance(val1, list) and isinstance(val2, list):
+            max_len = max(len(val1), len(val2))
+            for i in range(max_len):
+                item_path = f"{current_path}[{i}]"
+                if i >= len(val1):
+                    differences.append({
+                        'Difference Type': 'Extra',
+                        'Key Path': item_path,
+                        'Property': str(val2[i])
+                    })
+                elif i >= len(val2):
+                    differences.append({
+                        'Difference Type': 'Missing',
+                        'Key Path': item_path,
+                        'Property': str(val1[i])
+                    })
+                else:
+                    compare_values(val1[i], val2[i], item_path)
+        else:
+            if val1 != val2:
+                differences.append({
+                    'Difference Type': 'Value mismatch',
+                    'Key Path': current_path,
+                    'Property': f'{val1} -> {val2}'
+                })
+    
+    compare_values(obj1, obj2, path)
+    return differences
+
+
+def compare_text_lines(text1, text2):
+    """Compare two text strings line by line and return differences"""
+    lines1 = text1.splitlines()
+    lines2 = text2.splitlines()
+    
+    differences = []
+    
+    # Use difflib to get detailed differences
+    diff = list(difflib.unified_diff(lines1, lines2, lineterm='', n=0))
+    
+    current_line1 = 1
+    current_line2 = 1
+    
+    for line in diff:
+        if line.startswith('@@'):
+            # Parse line numbers from diff header
+            import re
+            match = re.match(r'@@ -(\d+)(?:,(\d+))? \+(\d+)(?:,(\d+))? @@', line)
+            if match:
+                start1 = int(match.group(1))
+                count1 = int(match.group(2)) if match.group(2) else 1
+                start2 = int(match.group(3))
+                count2 = int(match.group(4)) if match.group(4) else 1
+                current_line1 = start1
+                current_line2 = start2
+        elif line.startswith('---') or line.startswith('+++'):
+            continue
+        elif line.startswith('-'):
+            # Line removed from file 1 (missing in file 2)
+            differences.append({
+                'Difference Type': 'Missing Line',
+                'Line Number': str(current_line1),
+                'Content': line[1:]  # Remove the '-' prefix
+            })
+            current_line1 += 1
+        elif line.startswith('+'):
+            # Line added to file 2 (extra in file 2)
+            differences.append({
+                'Difference Type': 'Added Line',
+                'Line Number': str(current_line2),
+                'Content': line[1:]  # Remove the '+' prefix
+            })
+            current_line2 += 1
+        else:
+            # Context line (unchanged)
+            current_line1 += 1
+            current_line2 += 1
+            
+    return differences
+
+
+def highlight_json_strings(json1_str, json2_str, diffs):
+    """Add highlighting to JSON strings based on differences"""
+    try:
+        # Parse and format JSON
+        json1_obj = json.loads(json1_str)
+        json2_obj = json.loads(json2_str)
+        formatted1 = json.dumps(json1_obj, indent=2)
+        formatted2 = json.dumps(json2_obj, indent=2)
+        
+        # Create highlighted versions similar to XML
+        lines1 = formatted1.split('\n')
+        lines2 = formatted2.split('\n')
+        
+        highlighted1 = []
+        highlighted2 = []
+        
+        # Create a mapping of paths to line numbers for highlighting
+        diff_paths = {diff['Key Path'] for diff in diffs}
+        
+        # Simple highlighting - mark lines that contain paths mentioned in diffs
+        for i, line in enumerate(lines1):
+            line_highlighted = line
+            for path in diff_paths:
+                # Simple check if the line contains a key from the diff path
+                key_parts = path.split('.')
+                for key_part in key_parts:
+                    clean_key = key_part.split('[')[0]  # Remove array indices
+                    if f'"{clean_key}"' in line:
+                        diff_type = next((d['Difference Type'] for d in diffs if d['Key Path'] == path), 'Unknown')
+                        if diff_type == 'Missing':
+                            line_highlighted = f'<span class="highlight-remove">{line}</span>'
+                        elif diff_type == 'Extra':
+                            line_highlighted = f'<span class="highlight-add">{line}</span>'
+                        else:
+                            line_highlighted = f'<span class="highlight-mismatch">{line}</span>'
+                        break
+                if line_highlighted != line:
+                    break
+            highlighted1.append(line_highlighted)
+        
+        for i, line in enumerate(lines2):
+            line_highlighted = line
+            for path in diff_paths:
+                key_parts = path.split('.')
+                for key_part in key_parts:
+                    clean_key = key_part.split('[')[0]
+                    if f'"{clean_key}"' in line:
+                        diff_type = next((d['Difference Type'] for d in diffs if d['Key Path'] == path), 'Unknown')
+                        if diff_type == 'Missing':
+                            line_highlighted = f'<span class="highlight-add">{line}</span>'
+                        elif diff_type == 'Extra':
+                            line_highlighted = f'<span class="highlight-remove">{line}</span>'
+                        else:
+                            line_highlighted = f'<span class="highlight-mismatch">{line}</span>'
+                        break
+                if line_highlighted != line:
+                    break
+            highlighted2.append(line_highlighted)
+        
+        return '\n'.join(highlighted1), '\n'.join(highlighted2)
+        
+    except:
+        return json1_str, json2_str
+
+
+def highlight_text_strings(text1, text2, diffs):
+    """Add highlighting to text strings based on differences"""
+    lines1 = text1.splitlines()
+    lines2 = text2.splitlines()
+    
+    # Create highlighted versions
+    highlighted1 = []
+    highlighted2 = []
+    
+    # Use difflib to get detailed line-by-line differences
+    matcher = difflib.SequenceMatcher(None, lines1, lines2)
+    
+    for tag, i1, i2, j1, j2 in matcher.get_opcodes():
+        if tag == 'equal':
+            # Lines are the same
+            for i in range(i1, i2):
+                highlighted1.append(f'<span class="line-number">{i+1:3d}</span> {lines1[i]}')
+            for j in range(j1, j2):
+                highlighted2.append(f'<span class="line-number">{j+1:3d}</span> {lines2[j]}')
+        elif tag == 'delete':
+            # Lines only in file 1 (missing from file 2)
+            for i in range(i1, i2):
+                highlighted1.append(f'<span class="line-number">{i+1:3d}</span> <span class="diff-removed">{lines1[i]}</span>')
+        elif tag == 'insert':
+            # Lines only in file 2 (added to file 2)
+            for j in range(j1, j2):
+                highlighted2.append(f'<span class="line-number">{j+1:3d}</span> <span class="diff-added">{lines2[j]}</span>')
+        elif tag == 'replace':
+            # Lines are different
+            for i in range(i1, i2):
+                highlighted1.append(f'<span class="line-number">{i+1:3d}</span> <span class="diff-removed">{lines1[i]}</span>')
+            for j in range(j1, j2):
+                highlighted2.append(f'<span class="line-number">{j+1:3d}</span> <span class="diff-added">{lines2[j]}</span>')
+    
+    return '\n'.join(highlighted1), '\n'.join(highlighted2)
 
 
 if __name__ == '__main__':

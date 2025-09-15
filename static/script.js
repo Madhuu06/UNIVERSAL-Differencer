@@ -1,4 +1,7 @@
-// Utility functions
+// Multi-format comparison tool JavaScript
+// Supports XML, JSON, and Text comparison with enhanced validation and UI
+
+// Utility functions for validation
 function validateXML(xmlStr) {
   const trimmed = xmlStr.trim();
   
@@ -48,86 +51,20 @@ function validateXML(xmlStr) {
         cleanError = `Unclosed XML tag detected${lineRef}`;
       } else if (errorText.includes("mismatched tag")) {
         cleanError = `Mismatched XML tags${lineRef}`;
-      } else if (errorText.includes("XML declaration")) {
-        cleanError = `Invalid XML declaration${lineRef}`;
-      } else if (errorText.includes("StartTag:")) {
-        cleanError = `Invalid start tag${lineRef}`;
-      } else if (errorText.includes("EndTag:")) {
-        cleanError = `Invalid end tag${lineRef}`;
-      } else {
-        // Extract just the core error without browser-specific formatting
-        const errorLines = errorText.split('\n');
-        for (let line of errorLines) {
-          if (line.includes('error on line') || line.includes('Error:')) {
-            // Extract the actual error description
-            const parts = line.split(':');
-            if (parts.length > 2) {
-              cleanError = parts.slice(2).join(':').trim() + lineRef;
-              break;
-            }
-          }
-        }
-        if (cleanError === "Invalid XML syntax") {
-          cleanError = `Invalid XML syntax${lineRef}`;
-        }
       }
       
-      return { 
-        isValid: false, 
-        error: cleanError
-      };
+      return { isValid: false, error: cleanError };
     }
 
-    // Check if there's a root element
-    if (!doc.documentElement) {
-      return { 
-        isValid: false, 
-        error: "XML must have a root element" 
-      };
-    }
-
-    // Check for multiple root elements
+    // Additional validation - check for single root element
     const rootChildren = Array.from(doc.childNodes).filter(node => 
       node.nodeType === Node.ELEMENT_NODE
     );
-    
-    if (rootChildren.length === 0) {
-      return { 
-        isValid: false, 
-        error: "XML must contain at least one element" 
-      };
-    }
     
     if (rootChildren.length > 1) {
       return { 
         isValid: false, 
         error: "XML must have exactly one root element (found " + rootChildren.length + " root elements)" 
-      };
-    }
-
-    // Check for XML declaration issues (optional but helpful)
-    if (trimmed.startsWith('<?xml') && !trimmed.match(/^\s*<\?xml\s+version\s*=\s*["'][^"']+["']/)) {
-      return { 
-        isValid: false, 
-        error: "Invalid XML declaration format (line 1)" 
-      };
-    }
-
-    // Additional checks for common issues
-    if (trimmed.includes('<![CDATA[') && !trimmed.includes(']]>')) {
-      // Try to find the line number of the CDATA
-      const lines = trimmed.split('\n');
-      let cdataLine = null;
-      for (let i = 0; i < lines.length; i++) {
-        if (lines[i].includes('<![CDATA[')) {
-          cdataLine = i + 1;
-          break;
-        }
-      }
-      const lineRef = cdataLine ? ` (line ${cdataLine})` : "";
-      return { 
-        isValid: false, 
-        error: `Unclosed CDATA section${lineRef}` 
       };
     }
 
@@ -141,336 +78,404 @@ function validateXML(xmlStr) {
   }
 }
 
-// Legacy function for backward compatibility
-function isValidXML(xmlStr) {
-  return validateXML(xmlStr).isValid;
+function validateJSON(jsonStr) {
+  const trimmed = jsonStr.trim();
+  
+  if (!trimmed) {
+    return { isValid: false, error: "JSON content is empty" };
+  }
+
+  try {
+    JSON.parse(trimmed);
+    return { isValid: true, error: null };
+  } catch (error) {
+    let errorMessage = "Invalid JSON syntax";
+    
+    // Extract line information if available
+    const lineMatch = error.message.match(/at position (\d+)/);
+    if (lineMatch) {
+      const position = parseInt(lineMatch[1]);
+      const lines = trimmed.substring(0, position).split('\n');
+      const lineNumber = lines.length;
+      errorMessage += ` (line ${lineNumber})`;
+    }
+    
+    return { isValid: false, error: errorMessage };
+  }
 }
 
+function validateText(textStr) {
+  return { isValid: true, error: null };
+}
+
+// UI notification functions
 function showError(message) {
-  // Create a toast notification
   const toast = document.createElement('div');
-  toast.className = 'fixed top-4 right-4 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 transition-all duration-300';
+  toast.className = 'fixed top-4 right-4 bg-red-500 text-white px-6 py-4 rounded-lg shadow-lg z-50 max-w-md';
   toast.innerHTML = `
-    <div class="flex items-center">
-      <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+    <div class="flex items-start">
+      <svg class="w-5 h-5 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
       </svg>
-      <span>${message}</span>
+      <div>
+        <p class="font-medium">Error</p>
+        <p class="text-sm opacity-90">${message}</p>
+      </div>
     </div>
   `;
+  
   document.body.appendChild(toast);
   
   setTimeout(() => {
-    toast.style.opacity = '0';
-    toast.style.transform = 'translateX(100%)';
-    setTimeout(() => document.body.removeChild(toast), 300);
-  }, 4000);
+    if (toast.parentNode) {
+      toast.parentNode.removeChild(toast);
+    }
+  }, 5000);
 }
 
 function showSuccess(message) {
   const toast = document.createElement('div');
-  toast.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 transition-all duration-300';
+  toast.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-4 rounded-lg shadow-lg z-50 max-w-md';
   toast.innerHTML = `
-    <div class="flex items-center">
-      <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+    <div class="flex items-start">
+      <svg class="w-5 h-5 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
       </svg>
-      <span>${message}</span>
+      <div>
+        <p class="font-medium">Success</p>
+        <p class="text-sm opacity-90">${message}</p>
+      </div>
     </div>
   `;
+  
   document.body.appendChild(toast);
   
   setTimeout(() => {
-    toast.style.opacity = '0';
-    toast.style.transform = 'translateX(100%)';
-    setTimeout(() => document.body.removeChild(toast), 300);
+    if (toast.parentNode) {
+      toast.parentNode.removeChild(toast);
+    }
   }, 3000);
 }
 
-function setLoadingState(isLoading) {
-  const btn = document.getElementById("compareBtn");
-  const btnText = document.getElementById("btnText");
-  const spinner = document.getElementById("loadingSpinner");
+// Loading state management
+function setLoadingState(isLoading, buttonId) {
+  const btn = document.getElementById(buttonId);
+  if (!btn) return;
+  
+  const btnText = btn.querySelector(".btn-text");
+  const spinner = btn.querySelector(".loading-spinner");
   
   if (isLoading) {
     btn.disabled = true;
     btnText.textContent = "Comparing...";
-    spinner.classList.remove("hidden");
+    if (spinner) {
+      spinner.classList.remove("hidden");
+      spinner.classList.add("inline");
+    }
   } else {
     btn.disabled = false;
-    btnText.textContent = "Compare XML Files";
-    spinner.classList.add("hidden");
+    if (buttonId === "xmlCompareBtn") {
+      btnText.textContent = "Compare XML Files";
+    } else if (buttonId === "jsonCompareBtn") {
+      btnText.textContent = "Compare JSON Files";
+    } else if (buttonId === "textCompareBtn") {
+      btnText.textContent = "Compare Text Files";
+    }
+    if (spinner) {
+      spinner.classList.add("hidden");
+      spinner.classList.remove("inline");
+    }
   }
 }
 
-function updateStatistics(diffs) {
-  const totalDiffs = diffs.length;
-  const missingTags = diffs.filter(d => d['Difference Type'] === 'Tag missing').length;
-  const extraTags = diffs.filter(d => d['Difference Type'] === 'Extra tag').length;
-  const mismatchTags = diffs.filter(d => d['Difference Type'].includes('mismatch')).length;
+// Statistics update
+function updateStatistics(data, format) {
+  const totalElement = document.getElementById('totalDiffs');
+  const missingElement = document.getElementById('missingItems');
+  const extraElement = document.getElementById('extraItems');
+  const mismatchElement = document.getElementById('mismatchItems');
   
-  document.getElementById('totalDiffs').textContent = totalDiffs;
-  document.getElementById('missingTags').textContent = missingTags;
-  document.getElementById('extraTags').textContent = extraTags;
-  document.getElementById('mismatchTags').textContent = mismatchTags;
-}
-
-function getDiffTypeBadge(diffType) {
-  const badges = {
-    'Tag missing': 'diff-badge diff-badge-missing',
-    'Extra tag': 'diff-badge diff-badge-extra',
-    'Attribute missing': 'diff-badge diff-badge-missing',
-    'Attribute mismatch': 'diff-badge diff-badge-mismatch',
-    'Text mismatch': 'diff-badge diff-badge-text'
-  };
+  if (totalElement) totalElement.textContent = data.total_differences || 0;
+  if (missingElement) missingElement.textContent = data.missing_tags || data.missing_items || 0;
+  if (extraElement) extraElement.textContent = data.extra_tags || data.extra_items || 0;
+  if (mismatchElement) mismatchElement.textContent = (data.attribute_mismatches || 0) + (data.text_mismatches || 0) + (data.value_mismatches || 0);
   
-  return badges[diffType] || 'diff-badge diff-badge-text';
-}
-
-function populateDifferencesTable(diffs) {
-  const tbody = document.getElementById('differencesTableBody');
-  tbody.innerHTML = '';
+  // Update labels based on format
+  const missingLabel = document.getElementById('missingLabel');
+  const extraLabel = document.getElementById('extraLabel');
   
-  if (diffs.length === 0) {
-    tbody.innerHTML = `
-      <tr>
-        <td colspan="3" class="px-6 py-8 text-center text-gray-500">
-          <div class="flex flex-col items-center">
-            <svg class="w-12 h-12 text-gray-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
-            <p class="text-lg font-medium">No differences found!</p>
-            <p class="text-sm">The XML files are identical.</p>
-          </div>
-        </td>
-      </tr>
-    `;
-    return;
+  if (missingLabel && extraLabel) {
+    if (format === 'xml') {
+      missingLabel.textContent = 'Missing Tags';
+      extraLabel.textContent = 'Extra Tags';
+    } else if (format === 'json') {
+      missingLabel.textContent = 'Missing Keys';
+      extraLabel.textContent = 'Extra Keys';
+    } else if (format === 'text') {
+      missingLabel.textContent = 'Removed Lines';
+      extraLabel.textContent = 'Added Lines';
+    }
   }
+}
+
+// Results UI update
+function updateResultsForFormat(format) {
+  const leftPanelTitle = document.getElementById('leftPanelTitle');
+  const rightPanelTitle = document.getElementById('rightPanelTitle');
   
-  diffs.forEach((diff, index) => {
-    const row = document.createElement('tr');
-    row.className = index % 2 === 0 ? 'bg-white' : 'bg-gray-50';
-    
-    row.innerHTML = `
-      <td class="px-6 py-4 whitespace-nowrap">
-        <span class="${getDiffTypeBadge(diff['Difference Type'])}">
-          ${diff['Difference Type']}
-        </span>
-      </td>
-      <td class="px-6 py-4 text-sm text-gray-900 font-mono break-all">
-        ${diff['Tag Path']}
-      </td>
-      <td class="px-6 py-4 text-sm text-gray-900 font-mono">
-        ${diff['Attribute']}
-      </td>
-    `;
-    
-    tbody.appendChild(row);
+  if (leftPanelTitle) leftPanelTitle.textContent = `${format} File 1`;
+  if (rightPanelTitle) rightPanelTitle.textContent = `${format} File 2`;
+  
+  // Hide differences table for text format
+  const differencesTable = document.getElementById('differencesTable');
+  if (differencesTable) {
+    if (format === 'Text') {
+      differencesTable.style.display = 'none';
+    } else {
+      differencesTable.style.display = 'block';
+    }
+  }
+}
+
+// Format switching functionality
+function switchFormat(format) {
+  // Update active tab
+  document.querySelectorAll('.format-tab').forEach(tab => {
+    tab.classList.remove('bg-blue-600', 'text-white');
+    tab.classList.add('bg-gray-100', 'text-gray-700');
   });
-}
-
-function addValidationFeedback(textareaId) {
-  const textarea = document.getElementById(textareaId);
-  const parent = textarea.parentElement;
   
-  // Create feedback element if it doesn't exist
-  let feedback = parent.querySelector('.validation-feedback');
-  if (!feedback) {
-    feedback = document.createElement('div');
-    feedback.className = 'validation-feedback text-xs mt-1 hidden';
-    parent.appendChild(feedback);
+  const activeTab = document.querySelector(`[data-format="${format}"]`);
+  if (activeTab) {
+    activeTab.classList.remove('bg-gray-100', 'text-gray-700');
+    activeTab.classList.add('bg-blue-600', 'text-white');
   }
   
-  return feedback;
-}
-
-function updateValidationFeedback(textareaId) {
-  const textarea = document.getElementById(textareaId);
-  const content = textarea.value.trim();
-  const feedback = addValidationFeedback(textareaId);
+  // Hide all sections
+  document.querySelectorAll('.comparison-section').forEach(section => {
+    section.classList.add('hidden');
+  });
   
-  if (!content) {
-    feedback.className = 'validation-feedback text-xs mt-1 hidden';
-    textarea.className = textarea.className.replace(/border-(red|green)-500/g, 'border-gray-300');
-    return;
+  // Show selected section
+  const targetSection = document.getElementById(`${format}Section`);
+  if (targetSection) {
+    targetSection.classList.remove('hidden');
   }
   
-  const validation = validateXML(content);
-  
-  if (validation.isValid) {
-    const lineCount = content.split('\n').length;
-    feedback.innerHTML = `
-      <div class="flex items-center text-green-600">
-        <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-        </svg>
-        Valid XML (${lineCount} line${lineCount === 1 ? '' : 's'})
-      </div>
-    `;
-    feedback.className = 'validation-feedback text-xs mt-1';
-    textarea.className = textarea.className.replace(/border-(red|gray-300)-500/g, '') + ' border-green-500';
-  } else {
-    feedback.innerHTML = `
-      <div class="flex items-start text-red-600">
-        <svg class="w-3 h-3 mr-1 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-          <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
-        </svg>
-        <span>${validation.error}</span>
-      </div>
-    `;
-    feedback.className = 'validation-feedback text-xs mt-1';
-    textarea.className = textarea.className.replace(/border-(green|gray-300)-500/g, '') + ' border-red-500';
+  // Hide results when switching formats
+  const resultsSection = document.getElementById('resultsSection');
+  if (resultsSection) {
+    resultsSection.classList.add('hidden');
   }
 }
 
-// Event listeners
+// Main event listener
 document.addEventListener('DOMContentLoaded', function() {
-  const compareBtn = document.getElementById("compareBtn");
-  const resetBtn = document.getElementById("resetBtn");
-  const clearText1 = document.getElementById("clearText1");
-  const clearText2 = document.getElementById("clearText2");
-  const helpBtn1 = document.getElementById("helpBtn1");
-  const helpBtn2 = document.getElementById("helpBtn2");
-  const xmlHelp = document.getElementById("xmlHelp");
-  
-  // Compare button event
-  compareBtn.addEventListener("click", function () {
-    const xml1 = document.getElementById("text1").value.trim();
-    const xml2 = document.getElementById("text2").value.trim();
+  // Format tab event listeners
+  document.querySelectorAll('.format-tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+      const format = this.getAttribute('data-format');
+      switchFormat(format);
+    });
+  });
 
-    if (!xml1 || !xml2) {
-      showError("Please paste XML content into both text boxes.");
-      return;
-    }
+  // Initialize with XML section visible
+  switchFormat('xml');
 
-    // Validate XML 1
-    const xml1Validation = validateXML(xml1);
-    if (!xml1Validation.isValid) {
-      showError("XML File 1 Error: " + xml1Validation.error);
-      return;
-    }
+  // XML Compare button
+  const xmlCompareBtn = document.getElementById("xmlCompareBtn");
+  if (xmlCompareBtn) {
+    xmlCompareBtn.addEventListener("click", function () {
+      const xml1 = document.getElementById("xmlText1").value.trim();
+      const xml2 = document.getElementById("xmlText2").value.trim();
 
-    // Validate XML 2
-    const xml2Validation = validateXML(xml2);
-    if (!xml2Validation.isValid) {
-      showError("XML File 2 Error: " + xml2Validation.error);
-      return;
-    }
+      if (!xml1 || !xml2) {
+        showError("Please paste XML content into both text boxes.");
+        return;
+      }
 
-    setLoadingState(true);
+      const xml1Validation = validateXML(xml1);
+      if (!xml1Validation.isValid) {
+        showError("XML File 1 Error: " + xml1Validation.error);
+        return;
+      }
 
-    fetch("/compare", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ xml1, xml2 })
-    })
+      const xml2Validation = validateXML(xml2);
+      if (!xml2Validation.isValid) {
+        showError("XML File 2 Error: " + xml2Validation.error);
+        return;
+      }
+
+      setLoadingState(true, 'xmlCompareBtn');
+
+      fetch("/compare", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ xml1, xml2 })
+      })
       .then(response => response.json())
       .then(data => {
-        setLoadingState(false);
+        setLoadingState(false, 'xmlCompareBtn');
         
         if (data.error) {
           showError("Error: " + data.error);
           return;
         }
 
-        // Show results section
+        updateResultsForFormat('XML');
         document.getElementById("resultsSection").classList.remove("hidden");
         
-        // Update highlighted XML displays
-        document.getElementById("highlight-left").innerHTML = data.left || formatXMLForDisplay(xml1);
-        document.getElementById("highlight-right").innerHTML = data.right || formatXMLForDisplay(xml2);
+        const leftPanel = document.getElementById("highlight-left");
+        const rightPanel = document.getElementById("highlight-right");
         
-        // Update statistics
-        if (data.statistics) {
-          document.getElementById('totalDiffs').textContent = data.statistics.total_differences;
-          document.getElementById('missingTags').textContent = data.statistics.missing_tags;
-          document.getElementById('extraTags').textContent = data.statistics.extra_tags;
-          document.getElementById('mismatchTags').textContent = data.statistics.attribute_mismatches + data.statistics.text_mismatches;
-        }
+        if (leftPanel) leftPanel.innerHTML = data.left || xml1;
+        if (rightPanel) rightPanel.innerHTML = data.right || xml2;
         
-        // Populate differences table
-        if (data.differences) {
-          populateDifferencesTable(data.differences);
-        }
+        if (data.statistics) updateStatistics(data.statistics, 'xml');
         
-        // Scroll to results
-        document.getElementById("resultsSection").scrollIntoView({ behavior: 'smooth', block: 'start' });
-        
+        document.getElementById("resultsSection").scrollIntoView({ behavior: 'smooth' });
         showSuccess("XML comparison completed successfully!");
       })
       .catch(error => {
-        setLoadingState(false);
-        showError("An error occurred during comparison: " + error.message);
-        console.error(error);
+        setLoadingState(false, 'xmlCompareBtn');
+        showError("An error occurred: " + error.message);
       });
-  });
-  
-  // Reset button event
-  resetBtn.addEventListener("click", function() {
-    document.getElementById("text1").value = "";
-    document.getElementById("text2").value = "";
-    document.getElementById("resultsSection").classList.add("hidden");
-    document.getElementById("text1").focus();
-  });
-  
-  // Clear buttons
-  clearText1.addEventListener("click", function() {
-    document.getElementById("text1").value = "";
-    document.getElementById("text1").focus();
-  });
-  
-  clearText2.addEventListener("click", function() {
-    document.getElementById("text2").value = "";
-    document.getElementById("text2").focus();
-  });
-  
-  // Help buttons
-  helpBtn1.addEventListener("click", function() {
-    xmlHelp.classList.toggle("hidden");
-  });
-  
-function formatXMLForDisplay(xmlString) {
-  // Add basic XML syntax highlighting
-  return xmlString
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/&lt;/g, '<span class="text-blue-600">&lt;</span>')
-    .replace(/&gt;/g, '<span class="text-blue-600">&gt;</span>')
-    .replace(/(\s+)([a-zA-Z-]+)(=)/g, '$1<span class="text-purple-600">$2</span><span class="text-gray-500">$3</span>')
-    .replace(/"([^"]*)"/g, '"<span class="text-green-600">$1</span>"');
-}
-  
-  // Help buttons
-  helpBtn1.addEventListener("click", function() {
-    xmlHelp.classList.toggle("hidden");
-  });
-  
-  helpBtn2.addEventListener("click", function() {
-    xmlHelp.classList.toggle("hidden");
-  });
-  
-  // Auto-resize textareas and add validation
-  const textareas = document.querySelectorAll('textarea');
-  textareas.forEach(textarea => {
-    // Auto-resize functionality
-    textarea.addEventListener('input', function() {
-      this.style.height = 'auto';
-      this.style.height = Math.min(this.scrollHeight, 300) + 'px';
-      
-      // Add debounced validation
-      clearTimeout(this.validationTimeout);
-      this.validationTimeout = setTimeout(() => {
-        updateValidationFeedback(this.id);
-      }, 500);
     });
-    
-    // Initial validation on blur
-    textarea.addEventListener('blur', function() {
-      if (this.value.trim()) {
-        updateValidationFeedback(this.id);
+  }
+  
+  // JSON Compare button
+  const jsonCompareBtn = document.getElementById("jsonCompareBtn");
+  if (jsonCompareBtn) {
+    jsonCompareBtn.addEventListener("click", function () {
+      const json1 = document.getElementById("jsonText1").value.trim();
+      const json2 = document.getElementById("jsonText2").value.trim();
+
+      if (!json1 || !json2) {
+        showError("Please paste JSON content into both text boxes.");
+        return;
+      }
+
+      const json1Validation = validateJSON(json1);
+      if (!json1Validation.isValid) {
+        showError("JSON File 1 Error: " + json1Validation.error);
+        return;
+      }
+
+      const json2Validation = validateJSON(json2);
+      if (!json2Validation.isValid) {
+        showError("JSON File 2 Error: " + json2Validation.error);
+        return;
+      }
+
+      setLoadingState(true, 'jsonCompareBtn');
+
+      fetch("/compare_json", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ json1, json2 })
+      })
+      .then(response => response.json())
+      .then(data => {
+        setLoadingState(false, 'jsonCompareBtn');
+        
+        if (data.error) {
+          showError("Error: " + data.error);
+          return;
+        }
+
+        updateResultsForFormat('JSON');
+        document.getElementById("resultsSection").classList.remove("hidden");
+        
+        const leftPanel = document.getElementById("highlight-left");
+        const rightPanel = document.getElementById("highlight-right");
+        
+        if (leftPanel) leftPanel.innerHTML = data.left || json1;
+        if (rightPanel) rightPanel.innerHTML = data.right || json2;
+        
+        if (data.statistics) updateStatistics(data.statistics, 'json');
+        
+        document.getElementById("resultsSection").scrollIntoView({ behavior: 'smooth' });
+        showSuccess("JSON comparison completed successfully!");
+      })
+      .catch(error => {
+        setLoadingState(false, 'jsonCompareBtn');
+        showError("An error occurred: " + error.message);
+      });
+    });
+  }
+  
+  // Text Compare button
+  const textCompareBtn = document.getElementById("textCompareBtn");
+  if (textCompareBtn) {
+    textCompareBtn.addEventListener("click", function () {
+      const text1 = document.getElementById("textText1").value.trim();
+      const text2 = document.getElementById("textText2").value.trim();
+
+      if (!text1 || !text2) {
+        showError("Please paste text content into both text boxes.");
+        return;
+      }
+
+      setLoadingState(true, 'textCompareBtn');
+
+      fetch("/compare_text", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text1, text2 })
+      })
+      .then(response => response.json())
+      .then(data => {
+        setLoadingState(false, 'textCompareBtn');
+        
+        if (data.error) {
+          showError("Error: " + data.error);
+          return;
+        }
+
+        updateResultsForFormat('Text');
+        document.getElementById("resultsSection").classList.remove("hidden");
+        
+        const leftPanel = document.getElementById("highlight-left");
+        const rightPanel = document.getElementById("highlight-right");
+        
+        if (leftPanel) leftPanel.innerHTML = data.left || text1;
+        if (rightPanel) rightPanel.innerHTML = data.right || text2;
+        
+        if (data.statistics) updateStatistics(data.statistics, 'text');
+        
+        document.getElementById("resultsSection").scrollIntoView({ behavior: 'smooth' });
+        showSuccess("Text comparison completed successfully!");
+      })
+      .catch(error => {
+        setLoadingState(false, 'textCompareBtn');
+        showError("An error occurred: " + error.message);
+      });
+    });
+  }
+
+  // Reset button
+  const resetBtn = document.getElementById("resetBtn");
+  if (resetBtn) {
+    resetBtn.addEventListener("click", function() {
+      document.querySelectorAll('textarea').forEach(textarea => {
+        textarea.value = "";
+      });
+      
+      const resultsSection = document.getElementById("resultsSection");
+      if (resultsSection) {
+        resultsSection.classList.add("hidden");
+      }
+    });
+  }
+
+  // Clear buttons
+  document.querySelectorAll('.clear-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const targetId = this.getAttribute('data-target');
+      const target = document.getElementById(targetId);
+      if (target) {
+        target.value = '';
+        target.focus();
       }
     });
   });
