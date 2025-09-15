@@ -2,7 +2,7 @@
 
 A powerful, modern web-based comparison tool supporting XML, JSON, and Text files with professional-grade analysis and beautiful visualizations.
 
-## ✨ Features
+## Features
 
 ### 🎯 Smart Multi-Format Detection
 - **Intelligent format recognition** - automatically detects XML, JSON, or Text
@@ -64,36 +64,6 @@ A powerful, modern web-based comparison tool supporting XML, JSON, and Text file
 - Modified line detection (not just additions/deletions)
 - Clean, readable difference visualization
 
-## 📦 Installation
-
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/Madhuu06/XML-Differencer.git
-   cd XML-Differencer
-   ```
-
-2. **Create virtual environment**:
-   ```bash
-   python -m venv .venv
-   ```
-
-3. **Activate virtual environment**:
-   - Windows: `.venv\Scripts\activate`
-   - macOS/Linux: `source .venv/bin/activate`
-
-4. **Install dependencies**:
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-5. **Run the application**:
-   ```bash
-   python app.py
-   ```
-
-6. **Open browser** and navigate to:
-   - **Landing Page**: `http://127.0.0.1:5000/`
-   - **Comparison Tool**: `http://127.0.0.1:5000/compare`
 
 ## 🎯 How to Use
 
@@ -120,7 +90,7 @@ A powerful, modern web-based comparison tool supporting XML, JSON, and Text file
 - **Professional Results**: Clean statistics display without overwhelming details
 - **Responsive Design**: Perfect experience on desktop, tablet, and mobile
 
-## 🗂️ Project Structure
+## Project Structure
 
 ```
 Multi-Format-Differencer/
@@ -139,54 +109,3 @@ Multi-Format-Differencer/
 └── README.md               # This documentation
 ```
 
-## 🚀 Recent Major Updates
-
-### Version 2.0 - Modern Redesign
-- ✅ **Complete UI/UX overhaul** with professional modern design
-- ✅ **Multi-format support** - XML, JSON, and Text comparison
-- ✅ **Interactive landing page** with animations and visual effects
-- ✅ **Enhanced comparison engine** with precision highlighting
-- ✅ **Improved statistics** showing modified lines vs separate add/delete
-- ✅ **Professional styling** with glassmorphism and gradient effects
-- ✅ **Responsive design** optimized for all screen sizes
-- ✅ **Timeline visualization** for the "How It Works" section
-
-### Previous Improvements
-- ✅ Enhanced error messages with line numbers
-- ✅ Real-time validation across all formats
-- ✅ Comprehensive error detection
-- ✅ Visual feedback system
-- ✅ Tabbed interface for format switching
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Make your changes with proper testing
-4. Commit your changes (`git commit -m 'Add amazing feature'`)
-5. Push to the branch (`git push origin feature/amazing-feature`)
-6. Open a Pull Request
-
-## 📄 License
-
-This project is open source and available under the [MIT License](LICENSE).
-
-## 👨‍💻 Author
-
-**Madhuu06** - *Full-stack Developer*
-- GitHub: [@Madhuu06](https://github.com/Madhuu06)
-- Project: [XML-Differencer](https://github.com/Madhuu06/XML-Differencer)
-
-Built with ❤️ and modern web technologies
-
----
-
-## 🌟 Demo
-
-Experience the modern, professional file comparison tool with:
-- **Beautiful landing page** with interactive animations
-- **Smart multi-format detection** for XML, JSON, and Text
-- **Professional results** with precision highlighting
-- **Responsive design** that works on any device
-
-Try it now at the live demo or clone and run locally!
