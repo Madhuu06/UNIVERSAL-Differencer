@@ -19,21 +19,6 @@ A comprehensive, modern web-based file comparison tool that supports **5 major f
 - **Clean output formatting** - text comparison without line number artifacts
 - **Smart statistics** - accurate difference counting and categorization
 
-###  **Professional User Interface**
-- **Modern glassmorphism design** with smooth animations
-- **Tabbed interface** for seamless format switching
-- **Real-time validation** with visual feedback
-- **Responsive layout** optimized for all devices
-- **Color-coded results** with intuitive difference visualization
-- **Professional typography** using Inter font family
-
-###  **Performance & Reliability**
-- **Optimized algorithms** for large file processing
-- **Memory efficient** comparison operations
-- **Instant results** with sub-second response times
-- **100% client-server processing** - secure and private
-- **Error handling** with descriptive feedback
-
 ##  Technology Stack
 
 - **Backend**: Python Flask 2.3.3 with multi-format processing engine
@@ -73,14 +58,6 @@ Navigate to the modern landing page and select your comparison format from the t
 - Review precision highlighting showing only actual differences
 - Examine comprehensive statistics and insights
 
-##  Interface Highlights
-
-- ** Modern Landing Page**: Professional design with interactive animations
-- ** Tabbed Interface**: Seamless switching between all 5 formats
-- ** Real-time Validation**: Instant feedback with visual indicators
-- ** Clean Results Display**: Professional statistics without clutter
-- ** Responsive Design**: Perfect experience across all devices
-- ** Glassmorphism Effects**: Modern UI with smooth transitions
 
 ## Project Structure
 
