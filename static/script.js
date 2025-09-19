@@ -1,5 +1,73 @@
 // Multi-format comparison tool JavaScript
-// Supports XML, JSON, and Text comparison with enhanced validation and UI
+// Supports XML, JSON, Text, CSV, and YAML comparison with enhanced validation and UI
+
+// Drag and Drop functionality
+function handleDragOver(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  e.currentTarget.classList.add('border-blue-400', 'bg-blue-50');
+}
+
+function handleDragEnter(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  e.currentTarget.classList.add('border-blue-400', 'bg-blue-50');
+}
+
+function handleDragLeave(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  e.currentTarget.classList.remove('border-blue-400', 'bg-blue-50');
+}
+
+function handleDrop(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  
+  const textarea = e.currentTarget;
+  textarea.classList.remove('border-blue-400', 'bg-blue-50');
+  
+  const files = e.dataTransfer.files;
+  if (files.length > 0) {
+    const file = files[0];
+    const reader = new FileReader();
+    
+    reader.onload = function(event) {
+      textarea.value = event.target.result;
+      textarea.focus();
+      showSuccess(`File "${file.name}" loaded successfully!`);
+    };
+    
+    reader.onerror = function() {
+      showError('Error reading file. Please try again.');
+    };
+    
+    reader.readAsText(file);
+  }
+}
+
+// Enhanced validation with better user feedback
+function showValidationFeedback(element, isValid, message = '') {
+  const parent = element.parentElement;
+  let feedbackEl = parent.querySelector('.validation-feedback');
+  
+  if (feedbackEl) {
+    feedbackEl.remove();
+  }
+  
+  if (!isValid && message) {
+    feedbackEl = document.createElement('div');
+    feedbackEl.className = 'validation-feedback text-xs text-red-600 mt-1 p-2 bg-red-50 border border-red-200 rounded';
+    feedbackEl.textContent = message;
+    parent.appendChild(feedbackEl);
+    
+    element.classList.add('border-red-300', 'focus:ring-red-500');
+    element.classList.remove('border-gray-300', 'focus:ring-blue-500');
+  } else {
+    element.classList.remove('border-red-300', 'focus:ring-red-500');
+    element.classList.add('border-gray-300', 'focus:ring-blue-500');
+  }
+}
 
 // Utility functions for validation
 function validateXML(xmlStr) {
@@ -108,6 +176,48 @@ function validateText(textStr) {
   return { isValid: true, error: null };
 }
 
+function validateCSV(csvStr) {
+  const trimmed = csvStr.trim();
+  
+  if (!trimmed) {
+    return { isValid: false, error: "CSV content is empty" };
+  }
+
+  // Basic CSV validation - check for at least one line
+  const lines = trimmed.split('\n');
+  if (lines.length === 0) {
+    return { isValid: false, error: "CSV must contain at least one line" };
+  }
+
+  // Check if first line (header) exists
+  const firstLine = lines[0].trim();
+  if (!firstLine) {
+    return { isValid: false, error: "CSV must have a header row" };
+  }
+
+  return { isValid: true, error: null };
+}
+
+function validateYAML(yamlStr) {
+  const trimmed = yamlStr.trim();
+  
+  if (!trimmed) {
+    return { isValid: false, error: "YAML content is empty" };
+  }
+
+  // Basic YAML validation - check for reasonable structure
+  try {
+    // Simple check for basic YAML patterns
+    if (!trimmed.includes(':') && !trimmed.includes('-')) {
+      return { isValid: false, error: "Invalid YAML format - must contain key-value pairs" };
+    }
+    
+    return { isValid: true, error: null };
+  } catch (error) {
+    return { isValid: false, error: "Invalid YAML syntax: " + error.message };
+  }
+}
+
 // UI notification functions
 function showError(message) {
   const toast = document.createElement('div');
@@ -180,6 +290,10 @@ function setLoadingState(isLoading, buttonId) {
       btnText.textContent = "Compare JSON Files";
     } else if (buttonId === "textCompareBtn") {
       btnText.textContent = "Compare Text Files";
+    } else if (buttonId === "csvCompareBtn") {
+      btnText.textContent = "Compare CSV Files";
+    } else if (buttonId === "yamlCompareBtn") {
+      btnText.textContent = "Compare YAML Files";
     }
     if (spinner) {
       spinner.classList.add("hidden");
@@ -233,33 +347,117 @@ function updateResultsForFormat(format) {
 
 // Format switching functionality
 function switchFormat(format) {
-  // Update active tab
+  // Clear any existing validation feedback
+  document.querySelectorAll('.validation-feedback').forEach(el => el.remove());
+  document.querySelectorAll('.content-textarea').forEach(textarea => {
+    textarea.classList.remove('border-red-300', 'focus:ring-red-500');
+    textarea.classList.add('border-gray-300', 'focus:ring-blue-500');
+  });
+
+  // Update active tab with enhanced animation
   document.querySelectorAll('.format-tab').forEach(tab => {
-    tab.classList.remove('bg-blue-600', 'text-white');
+    tab.classList.remove('bg-blue-600', 'text-white', 'transform', 'scale-105', 'shadow-md');
     tab.classList.add('bg-gray-100', 'text-gray-700');
   });
   
   const activeTab = document.querySelector(`[data-format="${format}"]`);
   if (activeTab) {
     activeTab.classList.remove('bg-gray-100', 'text-gray-700');
-    activeTab.classList.add('bg-blue-600', 'text-white');
+    activeTab.classList.add('bg-blue-600', 'text-white', 'transform', 'scale-105', 'shadow-md');
   }
   
-  // Hide all sections
+  // Add fade-out animation to current sections
   document.querySelectorAll('.comparison-section').forEach(section => {
-    section.classList.add('hidden');
+    if (!section.classList.contains('hidden')) {
+      section.style.opacity = '0';
+      section.style.transform = 'translateY(-10px)';
+      setTimeout(() => {
+        section.classList.add('hidden');
+        section.style.opacity = '';
+        section.style.transform = '';
+      }, 150);
+    }
   });
   
-  // Show selected section
+  // Show selected section with fade-in animation
   const targetSection = document.getElementById(`${format}Section`);
   if (targetSection) {
-    targetSection.classList.remove('hidden');
+    setTimeout(() => {
+      targetSection.classList.remove('hidden');
+      targetSection.style.opacity = '0';
+      targetSection.style.transform = 'translateY(10px)';
+      
+      // Trigger animation
+      requestAnimationFrame(() => {
+        targetSection.style.transition = 'opacity 0.3s ease-out, transform 0.3s ease-out';
+        targetSection.style.opacity = '1';
+        targetSection.style.transform = 'translateY(0)';
+        
+        // Clean up inline styles after animation
+        setTimeout(() => {
+          targetSection.style.transition = '';
+          targetSection.style.opacity = '';
+          targetSection.style.transform = '';
+        }, 300);
+      });
+    }, 150);
   }
   
-  // Hide results when switching formats
+  // Hide results when switching formats with animation
   const resultsSection = document.getElementById('resultsSection');
-  if (resultsSection) {
-    resultsSection.classList.add('hidden');
+  if (resultsSection && !resultsSection.classList.contains('hidden')) {
+    resultsSection.style.opacity = '0';
+    resultsSection.style.transform = 'translateY(-10px)';
+    setTimeout(() => {
+      resultsSection.classList.add('hidden');
+      resultsSection.style.opacity = '';
+      resultsSection.style.transform = '';
+    }, 150);
+  }
+  
+  // Update page title dynamically
+  document.title = `Universal Differencer - ${format.toUpperCase()} Comparison`;
+  
+  // Show format-specific tips
+  showFormatTips(format);
+}
+
+// Show contextual tips for each format
+function showFormatTips(format) {
+  // Remove any existing tips
+  const existingTip = document.querySelector('.format-tip');
+  if (existingTip) {
+    existingTip.remove();
+  }
+  
+  const tips = {
+    xml: 'Tip: Ensure your XML has a single root element and all tags are properly closed.',
+    json: 'Tip: Make sure your JSON syntax is valid - use double quotes for strings and proper comma placement.',
+    text: 'Tip: Text comparison works line-by-line. Each line is compared for differences.',
+    csv: 'Tip: CSV files should have headers in the first row. Supports comma, semicolon, and tab delimiters.',
+    yaml: 'Tip: YAML is indentation-sensitive. Make sure your structure is properly aligned.'
+  };
+  
+  const tipText = tips[format];
+  if (tipText) {
+    const tipElement = document.createElement('div');
+    tipElement.className = 'format-tip mt-4 p-3 bg-blue-50 border-l-4 border-blue-400 text-blue-800 text-sm rounded-r-lg';
+    tipElement.innerHTML = `
+      <div class="flex items-start">
+        <svg class="w-5 h-5 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+        </svg>
+        <span>${tipText}</span>
+      </div>
+    `;
+    
+    const targetSection = document.getElementById(`${format}Section`);
+    if (targetSection) {
+      const inputSection = targetSection.querySelector('.mb-8');
+      if (inputSection) {
+        inputSection.appendChild(tipElement);
+      }
+    }
   }
 }
 
@@ -280,22 +478,32 @@ document.addEventListener('DOMContentLoaded', function() {
   const xmlCompareBtn = document.getElementById("xmlCompareBtn");
   if (xmlCompareBtn) {
     xmlCompareBtn.addEventListener("click", function () {
-      const xml1 = document.getElementById("xmlText1").value.trim();
-      const xml2 = document.getElementById("xmlText2").value.trim();
+      const xml1Input = document.getElementById("xmlText1");
+      const xml2Input = document.getElementById("xmlText2");
+      const xml1 = xml1Input.value.trim();
+      const xml2 = xml2Input.value.trim();
+
+      // Clear previous validation feedback
+      showValidationFeedback(xml1Input, true);
+      showValidationFeedback(xml2Input, true);
 
       if (!xml1 || !xml2) {
-        showError("Please paste XML content into both text boxes.");
+        if (!xml1) showValidationFeedback(xml1Input, false, "Please paste XML content here");
+        if (!xml2) showValidationFeedback(xml2Input, false, "Please paste XML content here");
+        showError("Please provide XML content in both text boxes.");
         return;
       }
 
       const xml1Validation = validateXML(xml1);
       if (!xml1Validation.isValid) {
+        showValidationFeedback(xml1Input, false, xml1Validation.error);
         showError("XML File 1 Error: " + xml1Validation.error);
         return;
       }
 
       const xml2Validation = validateXML(xml2);
       if (!xml2Validation.isValid) {
+        showValidationFeedback(xml2Input, false, xml2Validation.error);
         showError("XML File 2 Error: " + xml2Validation.error);
         return;
       }
@@ -447,6 +655,132 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
+  // CSV Compare button
+  const csvCompareBtn = document.getElementById("csvCompareBtn");
+  if (csvCompareBtn) {
+    csvCompareBtn.addEventListener("click", function () {
+      const csv1 = document.getElementById("csvText1").value.trim();
+      const csv2 = document.getElementById("csvText2").value.trim();
+
+      if (!csv1 || !csv2) {
+        showError("Please paste CSV content into both text boxes.");
+        return;
+      }
+
+      // Validate CSV content
+      const validation1 = validateCSV(csv1);
+      const validation2 = validateCSV(csv2);
+
+      if (!validation1.isValid) {
+        showError("CSV 1 validation failed: " + validation1.error);
+        return;
+      }
+
+      if (!validation2.isValid) {
+        showError("CSV 2 validation failed: " + validation2.error);
+        return;
+      }
+
+      setLoadingState(true, 'csvCompareBtn');
+
+      fetch("/compare_csv", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ csv1, csv2 })
+      })
+      .then(response => response.json())
+      .then(data => {
+        setLoadingState(false, 'csvCompareBtn');
+        
+        if (data.error) {
+          showError("Error: " + data.error);
+          return;
+        }
+
+        updateResultsForFormat('CSV');
+        document.getElementById("resultsSection").classList.remove("hidden");
+        
+        const leftPanel = document.getElementById("highlight-left");
+        const rightPanel = document.getElementById("highlight-right");
+        
+        if (leftPanel) leftPanel.innerHTML = data.left || csv1;
+        if (rightPanel) rightPanel.innerHTML = data.right || csv2;
+        
+        if (data.statistics) updateStatistics(data.statistics, 'csv');
+        
+        document.getElementById("resultsSection").scrollIntoView({ behavior: 'smooth' });
+        showSuccess("CSV comparison completed successfully!");
+      })
+      .catch(error => {
+        setLoadingState(false, 'csvCompareBtn');
+        showError("An error occurred: " + error.message);
+      });
+    });
+  }
+
+  // YAML Compare button
+  const yamlCompareBtn = document.getElementById("yamlCompareBtn");
+  if (yamlCompareBtn) {
+    yamlCompareBtn.addEventListener("click", function () {
+      const yaml1 = document.getElementById("yamlText1").value.trim();
+      const yaml2 = document.getElementById("yamlText2").value.trim();
+
+      if (!yaml1 || !yaml2) {
+        showError("Please paste YAML content into both text boxes.");
+        return;
+      }
+
+      // Validate YAML content
+      const validation1 = validateYAML(yaml1);
+      const validation2 = validateYAML(yaml2);
+
+      if (!validation1.isValid) {
+        showError("YAML 1 validation failed: " + validation1.error);
+        return;
+      }
+
+      if (!validation2.isValid) {
+        showError("YAML 2 validation failed: " + validation2.error);
+        return;
+      }
+
+      setLoadingState(true, 'yamlCompareBtn');
+
+      fetch("/compare_yaml", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ yaml1, yaml2 })
+      })
+      .then(response => response.json())
+      .then(data => {
+        setLoadingState(false, 'yamlCompareBtn');
+        
+        if (data.error) {
+          showError("Error: " + data.error);
+          return;
+        }
+
+        updateResultsForFormat('YAML');
+        document.getElementById("resultsSection").classList.remove("hidden");
+        
+        const leftPanel = document.getElementById("highlight-left");
+        const rightPanel = document.getElementById("highlight-right");
+        
+        if (leftPanel) leftPanel.innerHTML = data.left || yaml1;
+        if (rightPanel) rightPanel.innerHTML = data.right || yaml2;
+        
+        if (data.statistics) updateStatistics(data.statistics, 'yaml');
+        
+        document.getElementById("resultsSection").scrollIntoView({ behavior: 'smooth' });
+        showSuccess("YAML comparison completed successfully!");
+      })
+      .catch(error => {
+        setLoadingState(false, 'yamlCompareBtn');
+        showError("An error occurred: " + error.message);
+      });
+    });
+  }
+
   // Reset button
   const resetBtn = document.getElementById("resetBtn");
   if (resetBtn) {
@@ -473,4 +807,61 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   });
+
+  // Keyboard shortcuts
+  document.addEventListener('keydown', function(e) {
+    // Ctrl/Cmd + Enter to compare current format
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+      e.preventDefault();
+      
+      const activeTab = document.querySelector('.format-tab.bg-blue-600');
+      if (activeTab) {
+        const format = activeTab.getAttribute('data-format');
+        const compareBtn = document.getElementById(`${format}CompareBtn`);
+        if (compareBtn && !compareBtn.disabled) {
+          compareBtn.click();
+        }
+      }
+    }
+    
+    // Alt + number keys (1-5) to switch formats
+    if (e.altKey && !e.ctrlKey && !e.metaKey) {
+      const formats = ['xml', 'json', 'text', 'csv', 'yaml'];
+      const keyNum = parseInt(e.key);
+      
+      if (keyNum >= 1 && keyNum <= 5) {
+        e.preventDefault();
+        switchFormat(formats[keyNum - 1]);
+      }
+    }
+    
+    // Ctrl/Cmd + R to reset
+    if ((e.ctrlKey || e.metaKey) && e.key === 'r') {
+      e.preventDefault();
+      const resetBtn = document.getElementById('resetBtn');
+      if (resetBtn) {
+        resetBtn.click();
+      }
+    }
+  });
+
+  // Add keyboard shortcut hints
+  const shortcutHint = document.createElement('div');
+  shortcutHint.className = 'fixed bottom-4 right-4 bg-gray-800 text-white text-xs px-3 py-2 rounded-lg shadow-lg opacity-0 hover:opacity-100 transition-opacity duration-300 z-50';
+  shortcutHint.innerHTML = `
+    <div class="space-y-1">
+      <div><kbd class="bg-gray-700 px-1 rounded">Ctrl+Enter</kbd> Compare</div>
+      <div><kbd class="bg-gray-700 px-1 rounded">Alt+1-5</kbd> Switch format</div>
+      <div><kbd class="bg-gray-700 px-1 rounded">Ctrl+R</kbd> Reset</div>
+    </div>
+  `;
+  document.body.appendChild(shortcutHint);
+  
+  // Show shortcut hint briefly on load
+  setTimeout(() => {
+    shortcutHint.style.opacity = '1';
+    setTimeout(() => {
+      shortcutHint.style.opacity = '0';
+    }, 3000);
+  }, 1000);
 });

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Universal Differencer - Compare XML, JSON & Text Files</title>
+  <title>Universal Differencer - Compare XML, JSON, Text, CSV & YAML Files</title>
   <link href="../static/landingp.css" rel="stylesheet" />
   <link rel="icon" href="../static/img/favicon.png" type="image/png">
   <!-- Add Google Fonts for better typography -->
@@ -37,12 +37,12 @@
           <span>Multi-Format Support</span>
         </div>
         <h1 class="hero-title">
-          Compare <span class="hero-gradient">XML, JSON & Text</span><br>
+          Compare <span class="hero-gradient">XML, JSON, Text, CSV & YAML</span><br>
           Files with Precision
         </h1>
         <p class="hero-description">
           Professional file comparison tool that highlights differences with surgical precision. 
-          Support for XML, JSON, and Text formats with advanced highlighting and detailed analysis.
+          Support for XML, JSON, Text, CSV, and YAML formats with advanced highlighting and detailed analysis.
         </p>
         <div class="hero-buttons">
           <a href="/compare" class="btn btn-primary">
@@ -56,7 +56,7 @@
         </div>
         <div class="hero-stats">
           <div class="stat">
-            <div class="stat-number">3</div>
+            <div class="stat-number">5</div>
             <div class="stat-label">File Formats</div>
           </div>
           <div class="stat">
@@ -101,6 +101,8 @@
           <div class="floating-icon xml">XML</div>
           <div class="floating-icon json">JSON</div>
           <div class="floating-icon text">TXT</div>
+          <div class="floating-icon csv">CSV</div>
+          <div class="floating-icon yaml">YAML</div>
         </div>
       </div>
     </div>
@@ -122,7 +124,7 @@
             <h3 class="primary-feature-title">Smart Multi-Format Detection</h3>
             <p class="primary-feature-description">
               Our engine automatically detects file formats and applies the most appropriate 
-              comparison algorithms. Whether it's XML structures, JSON objects, or plain text - 
+              comparison algorithms. Whether it's XML structures, JSON objects, plain text, CSV data, or YAML configurations - 
               we've got you covered with precision parsing.
             </p>
             <div class="feature-highlights">
@@ -137,6 +139,14 @@
               <div class="highlight-item">
                 <i class="fas fa-file-text"></i>
                 <span>Text Line Comparison</span>
+              </div>
+              <div class="highlight-item">
+                <i class="fas fa-table"></i>
+                <span>CSV Data Analysis</span>
+              </div>
+              <div class="highlight-item">
+                <i class="fas fa-cog"></i>
+                <span>YAML Configuration</span>
               </div>
             </div>
           </div>
@@ -153,6 +163,14 @@
               <div class="format-card text-card">
                 <i class="fas fa-file-alt"></i>
                 <span>TEXT</span>
+              </div>
+              <div class="format-card csv-card">
+                <i class="fas fa-table"></i>
+                <span>CSV</span>
+              </div>
+              <div class="format-card yaml-card">
+                <i class="fas fa-cog"></i>
+                <span>YAML</span>
               </div>
             </div>
           </div>
@@ -192,7 +210,7 @@
               <h3 class="step-title">Choose & Upload</h3>
               <p class="step-description">
                 Select your file format and paste your content. Our smart interface 
-                automatically detects XML, JSON, or Text formats for optimal processing.
+                automatically detects XML, JSON, Text, CSV, or YAML formats for optimal processing.
               </p>
               <div class="step-features">
                 <span class="feature-tag">Smart Detection</span>

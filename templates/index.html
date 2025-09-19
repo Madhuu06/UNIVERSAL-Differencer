@@ -13,7 +13,7 @@
       href="https://fonts.googleapis.com/css2?display=swap&family=Inter:wght@400;500;700;900&family=Noto+Sans:wght@400;500;700;900"
     />
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link rel="stylesheet" href="{{ url_for('static', filename='highlight.css') }}">
+        <link rel="stylesheet" href="/static/highlight.css?v=18">
   </head>
 
   <body class="bg-gray-50">
@@ -51,24 +51,41 @@
           <p class="text-gray-600 mb-6">Choose your format and compare files with enhanced validation</p>
           
           <!-- Format Toggle Buttons -->
-          <div class="inline-flex bg-gray-100 rounded-lg p-1 mb-6">
-            <button data-format="xml" class="format-tab bg-blue-600 text-white px-6 py-2 rounded-md text-sm font-medium transition-all duration-300 ease-in-out">
+          <div class="flex flex-wrap justify-center gap-2 sm:inline-flex sm:bg-gray-100 sm:rounded-lg sm:p-1 mb-6">
+            <button data-format="xml" class="format-tab bg-blue-600 text-white px-4 sm:px-6 py-2 rounded-md text-sm font-medium transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-md active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
               <svg class="w-4 h-4 inline mr-2" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 0v12h8V4H6z"/>
               </svg>
-              XML
+              <span class="hidden sm:inline">XML</span>
+              <span class="sm:hidden">XML</span>
             </button>
-            <button data-format="json" class="format-tab bg-gray-100 text-gray-700 px-6 py-2 rounded-md text-sm font-medium transition-all duration-300 ease-in-out">
+            <button data-format="json" class="format-tab bg-gray-100 text-gray-700 px-4 sm:px-6 py-2 rounded-md text-sm font-medium transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-md hover:bg-gray-200 active:scale-95 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
               <svg class="w-4 h-4 inline mr-2" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"/>
               </svg>
-              JSON
+              <span class="hidden sm:inline">JSON</span>
+              <span class="sm:hidden">JSON</span>
             </button>
-            <button data-format="text" class="format-tab bg-gray-100 text-gray-700 px-6 py-2 rounded-md text-sm font-medium transition-all duration-300 ease-in-out">
+            <button data-format="text" class="format-tab bg-gray-100 text-gray-700 px-4 sm:px-6 py-2 rounded-md text-sm font-medium transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-md hover:bg-gray-200 active:scale-95 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
               <svg class="w-4 h-4 inline mr-2" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"/>
               </svg>
-              Text
+              <span class="hidden sm:inline">Text</span>
+              <span class="sm:hidden">Text</span>
+            </button>
+            <button data-format="csv" class="format-tab bg-gray-100 text-gray-700 px-4 sm:px-6 py-2 rounded-md text-sm font-medium transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-md hover:bg-gray-200 active:scale-95 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
+              <svg class="w-4 h-4 inline mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M4 2a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V4a2 2 0 00-2-2H4zm0 2h12v2H4V4zm0 4h4v2H4V8zm6 0h6v2h-6V8zm-6 4h4v2H4v-2zm6 0h6v2h-6v-2z"/>
+              </svg>
+              <span class="hidden sm:inline">CSV</span>
+              <span class="sm:hidden">CSV</span>
+            </button>
+            <button data-format="yaml" class="format-tab bg-gray-100 text-gray-700 px-4 sm:px-6 py-2 rounded-md text-sm font-medium transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-md hover:bg-gray-200 active:scale-95 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
+              <svg class="w-4 h-4 inline mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h12a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6z"/>
+              </svg>
+              <span class="hidden sm:inline">YAML</span>
+              <span class="sm:hidden">YAML</span>
             </button>
           </div>
         </div>
@@ -93,7 +110,8 @@
                   <textarea
                     id="xmlText1"
                     placeholder="Paste your first XML content here...&#10;&#10;Example:&#10;&lt;root&gt;&#10;  &lt;element&gt;value&lt;/element&gt;&#10;&lt;/root&gt;"
-                    class="content-textarea w-full h-40 px-4 py-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-mono text-sm"
+                    class="content-textarea w-full h-40 px-4 py-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 font-mono text-sm hover:border-gray-400 focus:shadow-lg"
+                    ondrop="handleDrop(event, this)" ondragover="handleDragOver(event)" ondragenter="handleDragEnter(event)" ondragleave="handleDragLeave(event)"
                   ></textarea>
                 </div>
 
@@ -109,7 +127,8 @@
                   <textarea
                     id="xmlText2"
                     placeholder="Paste your second XML content here...&#10;&#10;Example:&#10;&lt;root&gt;&#10;  &lt;element&gt;value&lt;/element&gt;&#10;&lt;/root&gt;"
-                    class="content-textarea w-full h-40 px-4 py-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-mono text-sm"
+                    class="content-textarea w-full h-40 px-4 py-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 font-mono text-sm hover:border-gray-400 focus:shadow-lg"
+                    ondrop="handleDrop(event, this)" ondragover="handleDragOver(event)" ondragenter="handleDragEnter(event)" ondragleave="handleDragLeave(event)"
                   ></textarea>
                 </div>
               </div>
@@ -171,7 +190,8 @@
                   <textarea
                     id="jsonText1"
                     placeholder="Paste your first JSON content here...&#10;&#10;Example:&#10;{&#10;  &quot;name&quot;: &quot;value&quot;,&#10;  &quot;array&quot;: [1, 2, 3]&#10;}"
-                    class="content-textarea w-full h-40 px-4 py-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-mono text-sm"
+                    class="content-textarea w-full h-40 px-4 py-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 font-mono text-sm hover:border-gray-400 focus:shadow-lg"
+                    ondrop="handleDrop(event, this)" ondragover="handleDragOver(event)" ondragenter="handleDragEnter(event)" ondragleave="handleDragLeave(event)"
                   ></textarea>
                 </div>
 
@@ -187,7 +207,8 @@
                   <textarea
                     id="jsonText2"
                     placeholder="Paste your second JSON content here...&#10;&#10;Example:&#10;{&#10;  &quot;name&quot;: &quot;value&quot;,&#10;  &quot;array&quot;: [1, 2, 3]&#10;}"
-                    class="content-textarea w-full h-40 px-4 py-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-mono text-sm"
+                    class="content-textarea w-full h-40 px-4 py-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 font-mono text-sm hover:border-gray-400 focus:shadow-lg"
+                    ondrop="handleDrop(event, this)" ondragover="handleDragOver(event)" ondragenter="handleDragEnter(event)" ondragleave="handleDragLeave(event)"
                   ></textarea>
                 </div>
               </div>
@@ -296,6 +317,136 @@
                   </svg>
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CSV Comparison Section -->
+        <div id="csvSection" class="comparison-section hidden">
+          <!-- Input Section -->
+          <div class="mb-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <!-- CSV Input 1 -->
+              <div class="space-y-2">
+                <div class="flex items-center justify-between">
+                  <label for="csvText1" class="text-sm font-semibold text-gray-700">CSV File 1</label>
+                  <div class="flex items-center space-x-2">
+                    <button class="clear-btn text-xs text-gray-500 hover:text-red-600 transition-colors" data-target="csvText1">Clear</button>
+                    <button class="help-btn text-xs text-blue-500 hover:text-blue-700 transition-colors" data-target="csvHelp">Help</button>
+                  </div>
+                </div>
+                <textarea
+                  id="csvText1"
+                  placeholder="Paste your first CSV content here...&#10;&#10;Example:&#10;Name,Age,City&#10;John,25,New York&#10;Jane,30,San Francisco"
+                  class="content-textarea w-full h-40 px-4 py-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-mono text-sm"
+                ></textarea>
+              </div>
+
+              <!-- CSV Input 2 -->
+              <div class="space-y-2">
+                <div class="flex items-center justify-between">
+                  <label for="csvText2" class="text-sm font-semibold text-gray-700">CSV File 2</label>
+                  <div class="flex items-center space-x-2">
+                    <button class="clear-btn text-xs text-gray-500 hover:text-red-600 transition-colors" data-target="csvText2">Clear</button>
+                  </div>
+                </div>
+                <textarea
+                  id="csvText2"
+                  placeholder="Paste your second CSV content here...&#10;&#10;Example:&#10;Name,Age,City&#10;John,26,New York&#10;Jane,30,Los Angeles"
+                  class="content-textarea w-full h-40 px-4 py-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-mono text-sm"
+                ></textarea>
+              </div>
+            </div>
+
+            <!-- CSV Help Section -->
+            <div id="csvHelp" class="help-section hidden mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <h4 class="font-semibold text-blue-900 mb-2">CSV Comparison Help</h4>
+              <ul class="text-sm text-blue-800 space-y-1">
+                <li>• Supports comma, semicolon, and tab-separated values</li>
+                <li>• Compares data row by row and column by column</li>
+                <li>• Detects missing/extra columns and rows</li>
+                <li>• Highlights cell value differences with precise location</li>
+                <li>• First row is treated as header</li>
+              </ul>
+            </div>
+
+            <!-- CSV Compare Button -->
+            <div class="mt-6 text-center">
+              <button
+                id="csvCompareBtn"
+                class="compare-btn px-8 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <span class="btn-text">Compare CSV Files</span>
+                <svg class="loading-spinner animate-spin -ml-1 mr-3 h-5 w-5 text-white hidden inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- YAML Comparison Section -->
+        <div id="yamlSection" class="comparison-section hidden">
+          <!-- Input Section -->
+          <div class="mb-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <!-- YAML Input 1 -->
+              <div class="space-y-2">
+                <div class="flex items-center justify-between">
+                  <label for="yamlText1" class="text-sm font-semibold text-gray-700">YAML File 1</label>
+                  <div class="flex items-center space-x-2">
+                    <button class="clear-btn text-xs text-gray-500 hover:text-red-600 transition-colors" data-target="yamlText1">Clear</button>
+                    <button class="help-btn text-xs text-blue-500 hover:text-blue-700 transition-colors" data-target="yamlHelp">Help</button>
+                  </div>
+                </div>
+                <textarea
+                  id="yamlText1"
+                  placeholder="Paste your first YAML content here...&#10;&#10;Example:&#10;name: John&#10;age: 25&#10;address:&#10;  city: New York&#10;  zip: 10001"
+                  class="content-textarea w-full h-40 px-4 py-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-mono text-sm"
+                ></textarea>
+              </div>
+
+              <!-- YAML Input 2 -->
+              <div class="space-y-2">
+                <div class="flex items-center justify-between">
+                  <label for="yamlText2" class="text-sm font-semibold text-gray-700">YAML File 2</label>
+                  <div class="flex items-center space-x-2">
+                    <button class="clear-btn text-xs text-gray-500 hover:text-red-600 transition-colors" data-target="yamlText2">Clear</button>
+                  </div>
+                </div>
+                <textarea
+                  id="yamlText2"
+                  placeholder="Paste your second YAML content here...&#10;&#10;Example:&#10;name: John&#10;age: 26&#10;address:&#10;  city: Los Angeles&#10;  zip: 90001"
+                  class="content-textarea w-full h-40 px-4 py-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-mono text-sm"
+                ></textarea>
+              </div>
+            </div>
+
+            <!-- YAML Help Section -->
+            <div id="yamlHelp" class="help-section hidden mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <h4 class="font-semibold text-blue-900 mb-2">YAML Comparison Help</h4>
+              <ul class="text-sm text-blue-800 space-y-1">
+                <li>• Supports nested structures and arrays</li>
+                <li>• Compares values at all levels of hierarchy</li>
+                <li>• Detects missing/extra keys and value changes</li>
+                <li>• Highlights structural differences with precise paths</li>
+                <li>• Preserves original formatting in comparison view</li>
+              </ul>
+            </div>
+
+            <!-- YAML Compare Button -->
+            <div class="mt-6 text-center">
+              <button
+                id="yamlCompareBtn"
+                class="compare-btn px-8 py-3 bg-orange-600 hover:bg-orange-700 text-white font-semibold rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <span class="btn-text">Compare YAML Files</span>
+                <svg class="loading-spinner animate-spin -ml-1 mr-3 h-5 w-5 text-white hidden inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+              </button>
             </div>
           </div>
         </div>
